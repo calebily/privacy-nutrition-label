@@ -73,10 +73,12 @@ function PrivacyLabel({
   onClose,
   onUseMinimum,
   source,
+  product,
 }: {
   onClose: () => void
   onUseMinimum: () => void
   source: 'person' | 'agent'
+  product: Product
 }) {
   return (
     <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>
@@ -105,6 +107,15 @@ function PrivacyLabel({
             <div><strong>2</strong><span>optional</span></div>
             <div className="no-track"><strong>None</strong><span>ad tracking</span></div>
           </div>
+          {product.privacy && (
+            <div className="device-privacy-note">
+              <span>About {product.name}</span>
+              <div>
+                <strong>{product.privacy.headline}</strong>
+                <p>{product.privacy.detail}</p>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="label-list">
@@ -179,6 +190,7 @@ function Shop({ onBuy }: { onBuy: (product: Product) => void }) {
                   <span>{product.category}</span>
                   <h3>{product.name}</h3>
                   <p>{product.description}</p>
+                  {product.privacy && <em className="product-privacy">{product.privacy.headline}</em>}
                 </div>
                 <div className="product-action">
                   <strong>{formatPrice(product.price)}</strong>
@@ -405,7 +417,7 @@ export default function App() {
               setPrivacySource('agent')
               setPrivacyOpen(true)
               setPrivacyReviewed(true)
-              return JSON.stringify(getAgentPrivacySummary())
+              return JSON.stringify(getAgentPrivacySummary(productRef.current))
             },
           },
           { signal: controller.signal },
@@ -562,7 +574,14 @@ export default function App() {
         </div>
       </footer>
 
-      {privacyOpen && <PrivacyLabel onClose={() => setPrivacyOpen(false)} onUseMinimum={applyMinimum} source={privacySource} />}
+      {privacyOpen && (
+        <PrivacyLabel
+          onClose={() => setPrivacyOpen(false)}
+          onUseMinimum={applyMinimum}
+          source={privacySource}
+          product={selectedProduct}
+        />
+      )}
     </div>
   )
 }

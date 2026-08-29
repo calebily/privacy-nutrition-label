@@ -83,6 +83,7 @@ svg { width: 1.1em; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-
 .product-info span { color: var(--accent); text-transform: uppercase; letter-spacing: .13em; font-size: 10px; font-weight: 600; }
 .product-info h3 { margin: 8px 0 9px; font: 600 18px/1.25 ui-sans-serif, sans-serif; letter-spacing: -.03em; }
 .product-info p { margin: 0; color: var(--muted); line-height: 1.5; font-size: 14px; }
+.product-privacy { display: block; margin-top: 12px; color: #526116; font-size: 10px; font-style: normal; font-weight: 600; letter-spacing: .02em; }
 .product-action { display: flex; justify-content: space-between; align-items: center; }
 .product-action strong { font-size: 14px; }
 .product-action button { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: var(--white); display: grid; place-items: center; cursor: pointer; transition: .2s ease; }
@@ -188,6 +189,10 @@ svg { width: 1.1em; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-
 .privacy-stats strong { font: 600 24px ui-sans-serif, sans-serif; }
 .privacy-stats span { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
 .privacy-stats .no-track { background: #f3f8e5; }
+.device-privacy-note { margin-top: 14px; padding: 16px 18px; background: #f3f8e5; display: grid; grid-template-columns: 150px 1fr; gap: 20px; align-items: start; }
+.device-privacy-note > span { color: #526116; font-size: 9px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+.device-privacy-note strong { display: block; color: #27320b; font-size: 12px; }
+.device-privacy-note p { margin: 5px 0 0; color: #617037; font-size: 11px; line-height: 1.45; }
 .label-list { border-top: 1px solid var(--line); }
 .label-list-heading, .label-row summary { display: grid; grid-template-columns: 1.05fr 2fr .6fr; gap: 24px; align-items: center; }
 .label-list-heading { padding: 12px 44px; color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: .11em; }
@@ -247,6 +252,7 @@ footer { min-height: 210px; padding: 54px clamp(24px, 5vw, 76px); background: va
   .privacy-stats { grid-template-columns: 1fr; }
   .privacy-stats > div { border-right: 0; border-bottom: 1px solid var(--line); }
   .privacy-stats > div:last-child { border-bottom: 0; }
+  .device-privacy-note { grid-template-columns: 1fr; gap: 8px; }
   .label-list-heading { display: none; }
   .label-row summary { grid-template-columns: 1fr auto; padding: 18px 24px; gap: 8px 16px; }
   .label-row summary > span:nth-child(2) { grid-column: 1 / -1; grid-row: 2; }

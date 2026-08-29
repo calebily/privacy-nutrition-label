@@ -18,6 +18,8 @@ This is not an AI summary of a privacy policy. Relay—the fictional retailer in
 
 No backend, database, authentication service, analytics, external fonts, or payment service is used. Refresh clears the demo.
 
+The collection uses one simple house-brand naming system—Loop, Hush, Halo, and Orbit—rather than presenting invented sub-brands. Orbit, the camera-free home companion, also demonstrates how a product-specific device privacy declaration can sit beside the action-specific checkout label without turning the MVP into a device-management platform.
+
 ## WebMCP tools
 
 The page registers two imperative WebMCP tools through `document.modelContext`:

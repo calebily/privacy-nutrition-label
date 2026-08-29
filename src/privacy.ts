@@ -113,9 +113,18 @@ export function createPrivacyReceipt(choice: PrivacyChoice): PrivacyReceipt {
   }
 }
 
-export function getAgentPrivacySummary() {
+export function getAgentPrivacySummary(product?: {
+  name: string
+  privacy?: { headline: string; detail: string }
+}) {
   return {
     action: 'Create a demo account and place an electronics order',
+    product: product
+      ? {
+          name: product.name,
+          device_privacy: product.privacy ?? 'No product-specific device disclosure.',
+        }
+      : undefined,
     summary: '3 required data groups, 2 optional. No advertising tracking.',
     required: privacyItems
       .filter((item) => item.required)
@@ -125,6 +134,7 @@ export function getAgentPrivacySummary() {
       .map(({ data, why, sharedWith }) => ({ data, why, sharedWith })),
     recommendation: 'Omit phone number and decline marketing for minimum disclosure.',
     boundary: 'Personal values remain in the page. Tool output contains categories and choices only.',
+    scope: 'The checkout label covers this purchase. Product-specific device privacy is declared separately when relevant.',
     next: 'Explain the minimum option and ask the person to confirm before completing checkout.',
   }
 }

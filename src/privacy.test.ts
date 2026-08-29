@@ -34,4 +34,22 @@ describe('privacy minimisation', () => {
     expect(summary).not.toContain('email@example.com')
     expect(summary).toContain('categories and choices only')
   })
+
+  it('includes a selected product privacy declaration without form values', () => {
+    const summary = getAgentPrivacySummary({
+      name: 'Orbit Home Companion',
+      privacy: {
+        headline: 'Camera-free · Voice processed on device',
+        detail: 'Cloud features are opt-in.',
+      },
+    })
+
+    expect(summary.product).toEqual({
+      name: 'Orbit Home Companion',
+      device_privacy: {
+        headline: 'Camera-free · Voice processed on device',
+        detail: 'Cloud features are opt-in.',
+      },
+    })
+  })
 })
