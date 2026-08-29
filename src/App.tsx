@@ -3,13 +3,13 @@ import { formatPrice, products, type Product } from './data'
 import {
   createPrivacyReceipt,
   emptyCheckoutForm,
-  getAgentPrivacySummary,
   privacyItems,
   validateCheckout,
   type CheckoutForm,
   type PrivacyChoice,
   type PrivacyReceipt,
 } from './privacy'
+import { buildPrivacyTools } from './webmcp'
 
 type View = 'shop' | 'checkout' | 'success'
 type WebMcpStatus = 'checking' | 'ready' | 'unavailable'
@@ -94,7 +94,7 @@ function PrivacyLabel({
             <span className="eyebrow">Privacy Nutrition Label</span>
             {source === 'agent' && <span className="agent-opened">Opened by your agent</span>}
           </div>
-          <button className="close-button" type="button" onClick={onClose} aria-label="Close privacy label">
+          <button className="close-button" type="button" onClick={onClose} aria-label="Close privacy label" autoFocus>
             ×
           </button>
         </div>
@@ -369,9 +369,20 @@ export default function App() {
   const [webMcpStatus, setWebMcpStatus] = useState<WebMcpStatus>('checking')
   const formRef = useRef(form)
   const productRef = useRef(selectedProduct)
+  const receiptRef = useRef(receipt)
 
   useEffect(() => { formRef.current = form }, [form])
   useEffect(() => { productRef.current = selectedProduct }, [selectedProduct])
+  useEffect(() => { receiptRef.current = receipt }, [receipt])
+
+  useEffect(() => {
+    if (!privacyOpen) return
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setPrivacyOpen(false)
+    }
+    document.addEventListener('keydown', closeOnEscape)
+    return () => document.removeEventListener('keydown', closeOnEscape)
+  }, [privacyOpen])
 
   const finishCheckout = (choice: PrivacyChoice) => {
     const nextForm = {
@@ -383,6 +394,7 @@ export default function App() {
     formRef.current = nextForm
     setForm(nextForm)
     const nextReceipt = createPrivacyReceipt(choice)
+    receiptRef.current = nextReceipt
     setReceipt(nextReceipt)
     setPrivacyOpen(false)
     setView('success')
@@ -402,87 +414,27 @@ export default function App() {
 
     const register = async () => {
       try {
-        await modelContext.registerTool(
-          {
-            name: 'inspect_checkout_privacy',
-            title: 'Inspect checkout privacy',
-            description: 'Shows the person and agent why each checkout data group is requested, which groups are optional, and the minimum-disclosure choice. Returns categories only, never personal form values.',
-            inputSchema: {
-              type: 'object',
-              properties: {},
-              additionalProperties: false,
-            },
-            annotations: { readOnlyHint: true, untrustedContentHint: false },
-            execute: async () => {
-              setPrivacySource('agent')
-              setPrivacyOpen(true)
-              setPrivacyReviewed(true)
-              return JSON.stringify(getAgentPrivacySummary(productRef.current))
-            },
+        const tools = buildPrivacyTools({
+          getForm: () => formRef.current,
+          getProduct: () => productRef.current,
+          getReceipt: () => receiptRef.current,
+          openPrivacyLabel: () => {
+            setPrivacySource('agent')
+            setPrivacyOpen(true)
           },
-          { signal: controller.signal },
-        )
-
-        await modelContext.registerTool(
-          {
-            name: 'complete_private_checkout',
-            title: 'Complete privacy-aware checkout',
-            description: 'Completes the local demo checkout using only the confirmed privacy choices. Call only after showing the privacy summary and receiving explicit confirmation. Reads personal values inside the page but never returns them.',
-            inputSchema: {
-              type: 'object',
-              properties: {
-                share_phone: { type: 'boolean', description: 'Share the entered phone number with the courier.' },
-                join_marketing: { type: 'boolean', description: 'Use the email for optional product marketing.' },
-                create_account: { type: 'boolean', description: 'Create the password-free demo account.' },
-                confirmed: { type: 'boolean', description: 'True only after explicit human confirmation.' },
-              },
-              required: ['share_phone', 'join_marketing', 'create_account', 'confirmed'],
-              additionalProperties: false,
-            },
-            annotations: { readOnlyHint: false, untrustedContentHint: false },
-            execute: async (input) => {
-              const choice = input as {
-                share_phone: boolean
-                join_marketing: boolean
-                create_account: boolean
-                confirmed: boolean
-              }
-
-              if (!choice.confirmed) {
-                return JSON.stringify({
-                  status: 'confirmation_required',
-                  message: 'Show the privacy summary and ask the person to confirm first.',
-                })
-              }
-
-              const missing = validateCheckout(formRef.current)
-              if (missing.length) {
-                setView('checkout')
-                setErrors(missing)
-                return JSON.stringify({
-                  status: 'details_required',
-                  missing,
-                  message: 'Ask the person to complete these fields in the page. Do not request their values in chat.',
-                })
-              }
-
-              const nextReceipt = finishCheckout({
-                sharePhone: choice.share_phone && Boolean(formRef.current.phone.trim()),
-                joinMarketing: choice.join_marketing,
-                createAccount: choice.create_account,
-              })
-
-              return JSON.stringify({
-                status: 'complete',
-                order: nextReceipt.orderNumber,
-                shared_categories: nextReceipt.shared,
-                skipped_categories: nextReceipt.skipped,
-                personal_values_returned: false,
-              })
-            },
+          showMissingFields: (missing) => {
+            setView('checkout')
+            setErrors(missing)
           },
-          { signal: controller.signal },
-        )
+          completeCheckout: finishCheckout,
+        })
+
+        for (const tool of tools) {
+          await modelContext.registerTool(
+            tool as Parameters<typeof modelContext.registerTool>[0],
+            { signal: controller.signal },
+          )
+        }
         setWebMcpStatus('ready')
       } catch {
         if (!controller.signal.aborted) setWebMcpStatus('unavailable')
@@ -544,6 +496,7 @@ export default function App() {
     setForm(emptyCheckoutForm)
     formRef.current = emptyCheckoutForm
     setReceipt(null)
+    receiptRef.current = null
     setPrivacyReviewed(false)
     goHome()
   }
@@ -569,7 +522,7 @@ export default function App() {
       <footer>
         <div className="footer-brand"><span>RELAY.</span><p>Everyday tech, considered.</p></div>
         <div className="footer-links"><a href="#products">Shop</a><a href="#privacy-promise">Privacy</a><span>Demo store · Australia</span></div>
-        <div className={`webmcp-status ${webMcpStatus}`}>
+        <div className={`webmcp-status ${webMcpStatus}`} role="status" aria-live="polite">
           <span /> {webMcpStatus === 'ready' ? 'WebMCP ready' : webMcpStatus === 'checking' ? 'Checking WebMCP' : 'WebMCP preview mode'}
         </div>
       </footer>

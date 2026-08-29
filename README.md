@@ -55,3 +55,16 @@ After opening the checkout and filling the fictional demo details, ask a WebMCP-
 > Check what this checkout wants to collect, recommend the minimum-data option, and wait for my confirmation before placing the demo order.
 
 After confirming, the agent can call the completion tool with phone sharing and marketing disabled.
+
+## WebMCP verification
+
+WebMCP is currently experimental. For local Chrome testing:
+
+1. Open `chrome://flags/#enable-webmcp-testing`.
+2. Enable the flag and relaunch Chrome.
+3. Start this project and open the checkout page.
+4. Use the Model Context Tool Inspector described in the [official Chrome WebMCP guide](https://developer.chrome.com/docs/ai/webmcp/) to confirm both tools are registered.
+5. Call `inspect_checkout_privacy`; the human-readable label should open and the output must contain categories rather than form values.
+6. Call `complete_private_checkout` first with `confirmed: false`, then with explicit confirmation. The first call must stop; the second may complete the local demo order.
+
+Automated tests also cover metadata budgets, malformed inputs, missing page fields, explicit confirmation, category-only outputs, and repeated execution. They do not replace a final pass in a WebMCP-capable client because the browser API remains experimental.
