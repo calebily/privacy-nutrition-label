@@ -66,6 +66,15 @@ describe('WebMCP privacy tools', () => {
         share_phone: false,
         join_marketing: false,
         create_account: true,
+        confirmed: true,
+        unexpected: true,
+      }),
+    ).toContain('invalid_request')
+    expect(
+      await tools[1].execute({
+        share_phone: false,
+        join_marketing: false,
+        create_account: true,
         confirmed: false,
       }),
     ).toContain('confirmation_required')
@@ -103,5 +112,17 @@ describe('WebMCP privacy tools', () => {
     expect(first).not.toContain(completedForm.email)
     expect(first).not.toContain(completedForm.address)
     expect(completeCheckout).toHaveBeenCalledOnce()
+  })
+
+  it('does not claim an empty optional phone number was shared', async () => {
+    const { tools } = setup()
+    const output = await tools[1].execute({
+      share_phone: true,
+      join_marketing: false,
+      create_account: true,
+      confirmed: true,
+    })
+    expect(output).toContain('"skipped_categories":["Phone number"')
+    expect(output).not.toContain('"shared_categories":["Phone number"')
   })
 })

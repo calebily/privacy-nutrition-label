@@ -377,11 +377,15 @@ export default function App() {
 
   useEffect(() => {
     if (!privacyOpen) return
+    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setPrivacyOpen(false)
     }
     document.addEventListener('keydown', closeOnEscape)
-    return () => document.removeEventListener('keydown', closeOnEscape)
+    return () => {
+      document.removeEventListener('keydown', closeOnEscape)
+      previouslyFocused?.focus()
+    }
   }, [privacyOpen])
 
   const finishCheckout = (choice: PrivacyChoice) => {
@@ -453,6 +457,8 @@ export default function App() {
 
   const startCheckout = (product: Product) => {
     setSelectedProduct(product)
+    setReceipt(null)
+    receiptRef.current = null
     setView('checkout')
     setErrors([])
     setPrivacyReviewed(false)

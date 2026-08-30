@@ -87,7 +87,11 @@ const completeToolMetadata = {
 function isCompleteCheckoutInput(input: unknown): input is CompleteCheckoutInput {
   if (!input || typeof input !== 'object') return false
   const value = input as Record<string, unknown>
+  const allowedKeys = ['share_phone', 'join_marketing', 'create_account', 'confirmed']
+  const keys = Object.keys(value)
   return (
+    keys.length === allowedKeys.length &&
+    keys.every((key) => allowedKeys.includes(key)) &&
     typeof value.share_phone === 'boolean' &&
     typeof value.join_marketing === 'boolean' &&
     typeof value.create_account === 'boolean' &&
