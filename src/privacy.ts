@@ -39,7 +39,7 @@ export const emptyCheckoutForm: CheckoutForm = {
   postcode: '',
   phone: '',
   marketing: false,
-  createAccount: true,
+  createAccount: false,
 }
 
 export const privacyItems: PrivacyItem[] = [
@@ -132,7 +132,7 @@ export function getAgentPrivacySummary(product?: {
     optional: privacyItems
       .filter((item) => !item.required)
       .map(({ data, why, sharedWith }) => ({ data, why, sharedWith })),
-    recommendation: 'Omit phone number and decline marketing for minimum disclosure.',
+    recommendation: 'Continue as a guest, omit phone number, and decline marketing for minimum disclosure.',
     boundary: 'Personal values remain in the page. Tool output contains categories and choices only.',
     scope: 'The checkout label covers this purchase. Product-specific device privacy is declared separately when relevant.',
     next: 'Explain the minimum option and ask the person to confirm before completing checkout.',
