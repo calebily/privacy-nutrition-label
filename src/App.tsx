@@ -22,7 +22,7 @@ const demoIdentity: CheckoutForm = {
   postcode: '2000',
   phone: '',
   marketing: false,
-  createAccount: true,
+  createAccount: false,
 }
 
 function ArrowIcon() {
@@ -476,7 +476,7 @@ export default function App() {
   }
 
   const applyMinimum = () => {
-    updateForm({ phone: '', marketing: false })
+    updateForm({ phone: '', marketing: false, createAccount: false })
     setPrivacyReviewed(true)
     setPrivacyOpen(false)
   }
