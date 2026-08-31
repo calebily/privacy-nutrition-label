@@ -11,7 +11,7 @@ const completedForm: CheckoutForm = {
   postcode: '2000',
   phone: '',
   marketing: false,
-  createAccount: true,
+  createAccount: false,
 }
 
 function setup(form: CheckoutForm = completedForm) {
