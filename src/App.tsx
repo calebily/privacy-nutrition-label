@@ -255,7 +255,7 @@ function Checkout({
           <div className="form-section">
             <div className="form-section-heading">
               <span>01</span>
-              <div><h2 id="contact-heading">Contact</h2><p>For your receipt and demo account.</p></div>
+              <div><h2 id="contact-heading">Contact</h2><p>For your receipt and order updates.</p></div>
             </div>
             <div className="field-grid two-columns">
               <label>Full name<input value={form.fullName} autoComplete="name" onChange={(e) => onChange({ fullName: e.target.value })} /></label>
