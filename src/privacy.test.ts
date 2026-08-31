@@ -21,18 +21,23 @@ describe('privacy minimisation', () => {
     const receipt = createPrivacyReceipt({
       sharePhone: false,
       joinMarketing: false,
-      createAccount: true,
+      createAccount: false,
     })
 
     expect(receipt.shared).toHaveLength(3)
     expect(receipt.skipped).toEqual(['Phone number', 'Marketing preference'])
-    expect(receipt.accountCreated).toBe(true)
+    expect(receipt.accountCreated).toBe(false)
+  })
+
+  it('starts the checkout on the guest minimum-data path', () => {
+    expect(emptyCheckoutForm.createAccount).toBe(false)
   })
 
   it('keeps personal values out of the agent summary', () => {
     const summary = JSON.stringify(getAgentPrivacySummary())
     expect(summary).not.toContain('email@example.com')
     expect(summary).toContain('categories and choices only')
+    expect(summary).toContain('Continue as a guest')
   })
 
   it('includes a selected product privacy declaration without form values', () => {
