@@ -46,7 +46,7 @@ export const privacyItems: PrivacyItem[] = [
   {
     id: 'contact',
     data: 'Name & email',
-    why: 'Send your receipt and identify your demo account.',
+    why: 'Send your receipt and identify this demo order.',
     required: true,
     sharedWith: 'Not shared outside Relay.',
     retention: 'Kept with the demo order until refresh.',
@@ -118,7 +118,7 @@ export function getAgentPrivacySummary(product?: {
   privacy?: { headline: string; detail: string }
 }) {
   return {
-    action: 'Create a demo account and place an electronics order',
+    action: 'Place an electronics order with optional account creation',
     product: product
       ? {
           name: product.name,
